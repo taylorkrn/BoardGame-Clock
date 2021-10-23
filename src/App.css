@@ -1,0 +1,82 @@
+body {
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+img {
+  width: auto;
+  height: 50px;
+}
+
+.MyGrid{
+  display: grid;
+  grid-template-rows: 30% 40% 30%;
+  align-items: center;
+}
+
+.Score-Flex{
+  display: flex;
+  justify-content:  space-around;
+  align-items: center;
+  background-color: lightgrey;
+  border-radius:  20px;
+  border:  solid 5px rgba(76,76,76,0.5);
+  margin:  50px;
+  height:  120px;
+  max-width:  600px;
+  min-width: 400px;
+}
+
+.Scorecard-Flex{
+  display: flex;
+  justify-content:  center;
+  z-index: 100;
+}
+
+.Count-Flex{
+  display: flex;
+  min-width:  200px;
+  justify-content:  space-around;
+  background-color: white;
+  border-radius:  20px;
+  border: solid 1px rgba(76,76,76,0.5);
+  align-items: center;
+  height: 90px;
+}
+
+.App-header {
+  display: flex;
+  margin:  20px;
+  margin-bottom: 100px;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(3px + 2vmin);
+  color: lightgray;
+}
+
+.MyButton{
+  grid-row-start: 3;
+  width:20px;
+  height: 20px;
+  text-align: center;
+  color: blue;
+  background-color: white;
+  border:  none;
+}
+
+.nameInput{
+  disabled:  true;
+}
+
+input .nameInput toEdit{
+  disabled: false;
+}
+
+
+.nextButton{
+  disabled: true;
+}
+
+.nameButton toEdit{
+  disabled: false;
+}
