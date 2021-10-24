@@ -5,24 +5,22 @@ import CountdownClock from './CountdownClock.js'
 
 export default function Player({ player, HandleNextTurn, HandleNameChange, HandleInternalPosition}){
 
-    const position = player.Position;
-
     function handleName(e){
-        HandleNameChange(e.target.value, position-1);
+        HandleNameChange(e.target.value, player.Id);
     }
 
     function handlePosition(e){
-        HandleInternalPosition(position-1,parseInt(e.target.value));
+        HandleInternalPosition(player.Id,parseInt(e.target.value));
     }
 
     return(
         <div>
+            <input type='number' value={player.Position+1} onChange={handlePosition} disabled={true} className='position'/>
             <input value={player.Name} onChange={handleName} disabled={true} className='name'/>
-            <input type='number' value={player.Position} onChange={handlePosition} disabled={true} className='position'/>
             <CountdownClock
                 SecsLeft = {player.TimeAllowed}
             />
-            <button onClick={HandleNextTurn} style={{visibility: "hidden"}} className='nextTurn' id={position}> > </button>
+            <button onClick={HandleNextTurn} style={{visibility: "hidden"}} className='nextTurn' id={player.Id}> > </button>
         </div>
     )
 }

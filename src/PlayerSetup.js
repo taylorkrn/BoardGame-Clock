@@ -9,9 +9,11 @@ function PlayerSetup(){
     const [players, setPlayers] = useState([]);
     const [counter, setCounter] = useState(0);
 
-    const readyForCount = useRef(false);
+    const firstLoad = useRef(true);
 
     const noPlayersRef = useRef();
+
+    let interval;
 
     function handlePlayers(e) {
         e.preventDefault();
@@ -23,7 +25,7 @@ function PlayerSetup(){
         setNumPlayers(noPlayers);
         const myArray = [];
         for (let i=0; i<noPlayers; i++){
-            myArray.push({Id: i, Name: `Player ${i+1}`, Position: i+1, TimeAllowed: timeAllowed, Active: false});
+            myArray.push({Id: i, Name: `Player ${i+1}`, Position: i, TimeAllowed: timeAllowed, Active: false, AlreadyCounting: false});
         }
         setPlayers(myArray);
         document.querySelector('#StartForm').style.display = 'none';
@@ -50,59 +52,60 @@ function PlayerSetup(){
     }
 
     useEffect(() => {
-        console.log("in Effect");
-        if (readyForCount.current){
-            console.log("Ready for Count");
-            handleCountdown(counter);
-            readyForCount.current = false;
+        if (firstLoad.current){
+            firstLoad.current = false;
+            return;
         }
+        handleCountdown(counter);
     }, [players]);
 
     function handleStartGame(e){
-        readyForCount.current = true;
+        // readyForCount.current = true;
         setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === 0 ? {...player, Active: true} : {...player}));
         document.querySelector('#StartGame').style.display = 'none';
         const names = document.querySelectorAll('.name');
         names.forEach(name => name.disabled = true);
-        document.getElementById('1').style.visibility="visible";
+        document.getElementById('0').style.visibility="visible";
+        console.log(players);
     }
 
     function handleNextTurn(){
-        setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === counter ? {...player, Active: false} : {...player}));
+        clearInterval(interval);
+        console.log(counter);
+        setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === counter ? {...player, Active: false, AlreadyCounting: false} : {...player}));
         const nextCounter = (counter + 1) % numPlayers;
-        document.getElementById(`${nextCounter}`).style.visibility="hidden";
-        setCounter(nextCounter);
+        document.getElementById(`${counter}`).style.visibility="hidden";
+        setCounter(oldCounter => nextCounter);
         if (nextCounter === 0){
             checkForOrderChange();
             return;
         }
-        readyForCount.current = true;
+        // readyForCount.current = true;
         setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === nextCounter ? {...player, Active: true} : {...player}));
-        document.getElementById(`${nextCounter+1}`).style.visibility="visible";
+        document.getElementById(`${nextCounter}`).style.visibility="visible";
     }
 
     function handleCountdown(myCounter){
-        const activePlayer = players[myCounter];
-        if (!activePlayer.Active){
+        if (!players[myCounter].Active || players[myCounter].AlreadyCounting){
             return;
         }
         const now = Date.now();
-        const then = now + activePlayer.TimeAllowed * 1000;
-        const interval = setInterval(() => {
+        const then = now + players[myCounter].TimeAllowed * 1000;
+        interval = setInterval(() => {
             //check if we should stop the timer
+            console.log(players[myCounter].Active);
             if(!players[myCounter].Active){
+                console.log("Out!");
                 clearInterval(interval);
                 return;
             };
             const secondsLeft = Math.round((then - Date.now()) / 1000);
+            setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === myCounter ? {...player, TimeAllowed: secondsLeft, AlreadyCounting: true} : {...player}));
             if (secondsLeft <= 0){
-                alert(`${activePlayer.name} ran out of time`);
+                alert(`${players[myCounter].Name} ran out of time`);
                 clearInterval(interval);
                 return;
             }
-            setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === myCounter ? {...player, TimeAllowed: secondsLeft} : {...player}));
-            console.log(secondsLeft);
-            console.log(players);
         }, 1000);
     }
 
@@ -113,14 +116,14 @@ function PlayerSetup(){
     }
 
     function handleOrderChange(){
-        readyForCount.current = true;
+        // readyForCount.current = true;
         const myArray = [...players];
         myArray.sort((a,b) => a.Position > b.Position ? 1 : -1);
         setPlayers(oldPlayers => {oldPlayers.map((player) => player.Id === 0 ? {...myArray[player.Id], Id: player.Id, Active: true} : {...myArray[player.Id], Id: player.Id})});
         const positions = document.querySelectorAll('.position');
         positions.forEach(pos => pos.disabled = true);
         document.querySelector('.changeOrder').style.display = 'none';
-        document.getElementById('1').style.visibility="visible";
+        document.getElementById('0').style.visibility="visible";
     }
 
     function handleInternalPosition(oldPos, newPos) {
@@ -132,7 +135,7 @@ function PlayerSetup(){
     }
 
     function endGame(){
-        document.getElementById(`${counter+1}`).style.visibility="hidden";
+        document.getElementById(`${counter}`).style.visibility="hidden";
     }
 
     return(
