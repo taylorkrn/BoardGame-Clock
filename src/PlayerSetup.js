@@ -114,7 +114,7 @@ function PlayerSetup(){
     //Function to allow players to change their order
     function checkForOrderChange(){
         const positions = document.querySelectorAll('.position');
-        positions.forEach(pos => pos.disabled = false);
+        positions.forEach(pos => pos.style.visibility = 'visible');
         document.querySelector('.changeOrder').style.display = 'block';
     }
 
@@ -128,7 +128,7 @@ function PlayerSetup(){
         }
         setPlayers(myArray);
         const positions = document.querySelectorAll('.position');
-        positions.forEach(pos => pos.disabled = true);
+        positions.forEach(pos => pos.style.visibility = 'hidden');
         document.querySelector('.changeOrder').style.display = 'none';
         document.getElementById('0').style.visibility="visible";
     }

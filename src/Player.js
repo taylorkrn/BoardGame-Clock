@@ -17,7 +17,7 @@ export default function Player({ player, HandleNextTurn, HandleNameChange, Handl
         <div className="Player">
             <div className="Square">
                 <div className="PlayerPiece" style={{backgroundColor: `${player.Color}`}}>
-                    <input type='number' value={player.Position+1} onChange={handlePosition} disabled={true} className='position'/>
+                    <input type='number' value={player.Position+1} onChange={handlePosition} style={{visibility: 'hidden'}} className='position'/>
                 </div>
             </div>
             <input value={player.Name} onChange={handleName} disabled={true} className='name'/>

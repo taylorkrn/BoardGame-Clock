@@ -4,7 +4,7 @@ import './App.css';
 
 export default function CountdownClock({SecsLeft}){
 
-    let textColor = 'black';
+    let textColor = 'white';
     if (SecsLeft <= 0){
         textColor = 'red';
     }
