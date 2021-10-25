@@ -4,46 +4,80 @@ import PlayerList from './PlayerList.js';
 
 function PlayerSetup(){
 
-    const [numPlayers, setNumPlayers] = useState(0);
-    const [timeAllowed, setTimeAllowed] = useState(0);
     const [players, setPlayers] = useState([]);
     const [counter, setCounter] = useState(0);
 
+    const colors = ['red', 'green', 'yellow', 'blue', 'white', 'black'];
+
+    // Ref so that UseEffect is not run when the page is first loaded
     const firstLoad = useRef(true);
 
+    useEffect(() => {
+        if (firstLoad.current){
+            firstLoad.current = false;
+            return;
+        }
+        const myCounter = counter;
+        if (!players[counter].Active){
+            return;
+        }
+        const now = Date.now();
+        const then = now + players[myCounter].TimeAllowed * 1000;
+        const timer = setTimeout(() => {
+            //check if we should stop the timer
+            if(!players[myCounter].Active || myCounter !== counter){
+                console.log("Out!");
+                clearTimeout(timer);
+                return;
+            };
+            const secondsLeft = Math.round((then - Date.now()) / 1000);
+            console.log(secondsLeft);
+            setPlayers(previousPlayers => previousPlayers.map(player => player.Id === myCounter ? {...player, TimeAllowed: secondsLeft} : {...player}));;
+            if (secondsLeft <= 0){
+                alert(`${players[myCounter].Name} ran out of time`);
+                clearTimeout(timer);
+                return;
+            }
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [players, counter]);
+
+    let numPlayers = 0;
+    let timeAllowed = 0;
+
+    // Ref to save and use the input for amount of time
     const noPlayersRef = useRef();
 
-    let interval;
-
+    //Set number of players based on Input
     function handlePlayers(e) {
         e.preventDefault();
-        const noPlayers = noPlayersRef.current.value;
-        if (!(noPlayers > 1 && noPlayers <= 6)) {
+        numPlayers = noPlayersRef.current.value;
+        if (!(numPlayers > 1 && numPlayers <= 6)) {
             alert('Invalid amount of Players, must be between 2 and 6');
             return;
         };
-        setNumPlayers(noPlayers);
         const myArray = [];
-        for (let i=0; i<noPlayers; i++){
-            myArray.push({Id: i, Name: `Player ${i+1}`, Position: i, TimeAllowed: timeAllowed, Active: false, AlreadyCounting: false});
+        for (let i=0; i<numPlayers; i++){
+            myArray.push({Id: i, Name: `Player ${i+1}`, Position: i, TimeAllowed: timeAllowed, Active: false, AlreadyCounting: false, Color: colors[i]});
         }
         setPlayers(myArray);
         document.querySelector('#StartForm').style.display = 'none';
         document.querySelector('#TimeForm').style.display = 'block';
     }
 
+    // Ref to save and use the input for amount of time
     const timeAllowedRef = useRef();
 
+    //Set amount of time allowed based on input
     function handleTime(e) {
         e.preventDefault();
-        const timeLimit = timeAllowedRef.current.value;
-        if (!(timeLimit => 1 && timeLimit <= 300)) {
+        timeAllowed = timeAllowedRef.current.value;
+        if (!(timeAllowed => 1 && timeAllowed <= 300)) {
             alert('Invalid amount of Time, must be between 1 and 300');
             return;
         };
-        setTimeAllowed(timeLimit);
-        setPlayers((oldPlayers) => oldPlayers.map(player => {
-            return {...player, TimeAllowed: timeLimit*60};
+        setPlayers(oldPlayers => oldPlayers.map(player => {
+            return {...player, TimeAllowed: timeAllowed*60};
         }))
         document.querySelector('#TimeForm').style.display = 'none';
         document.querySelector('#StartGame').style.display = 'block';
@@ -51,87 +85,94 @@ function PlayerSetup(){
         names.forEach(name => name.disabled = false);
     }
 
-    useEffect(() => {
-        if (firstLoad.current){
-            firstLoad.current = false;
-            return;
-        }
-        handleCountdown(counter);
-    }, [players]);
-
+    //Function to start the game
     function handleStartGame(e){
-        // readyForCount.current = true;
-        setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === 0 ? {...player, Active: true} : {...player}));
+        setPlayers(oldPlayers => oldPlayers.map(player => player.Id === 0 ? {...player, Active: true} : {...player}));
         document.querySelector('#StartGame').style.display = 'none';
         const names = document.querySelectorAll('.name');
         names.forEach(name => name.disabled = true);
         document.getElementById('0').style.visibility="visible";
-        console.log(players);
     }
+
 
     function handleNextTurn(){
-        clearInterval(interval);
-        console.log(counter);
-        setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === counter ? {...player, Active: false, AlreadyCounting: false} : {...player}));
-        const nextCounter = (counter + 1) % numPlayers;
         document.getElementById(`${counter}`).style.visibility="hidden";
-        setCounter(oldCounter => nextCounter);
+        const nextCounter = (counter + 1) % players.length;
         if (nextCounter === 0){
+            setPlayers(oldPlayers => oldPlayers.map(player => {
+                if (player.Id === counter){
+                    return {...player, Active: false, AlreadyCounting: false}
+                } else {
+                    return {...player};
+                }
+            }));
+            setCounter(counter => nextCounter);
             checkForOrderChange();
-            return;
+        } else {
+            document.getElementById(`${nextCounter}`).style.visibility="visible";
+            setPlayers(oldPlayers => oldPlayers.map(player => {
+                if (player.Id === nextCounter){
+                    return {...player, Active: true}
+                } else if (player.Id === counter){
+                    return {...player, Active: false, AlreadyCounting: false}
+                } else {
+                    return {...player};
+                }
+            }));
+            setCounter(counter => nextCounter);
         }
-        // readyForCount.current = true;
-        setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === nextCounter ? {...player, Active: true} : {...player}));
-        document.getElementById(`${nextCounter}`).style.visibility="visible";
     }
 
-    function handleCountdown(myCounter){
-        if (!players[myCounter].Active || players[myCounter].AlreadyCounting){
-            return;
-        }
-        const now = Date.now();
-        const then = now + players[myCounter].TimeAllowed * 1000;
-        interval = setInterval(() => {
-            //check if we should stop the timer
-            console.log(players[myCounter].Active);
-            if(!players[myCounter].Active){
-                console.log("Out!");
-                clearInterval(interval);
-                return;
-            };
-            const secondsLeft = Math.round((then - Date.now()) / 1000);
-            setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === myCounter ? {...player, TimeAllowed: secondsLeft, AlreadyCounting: true} : {...player}));
-            if (secondsLeft <= 0){
-                alert(`${players[myCounter].Name} ran out of time`);
-                clearInterval(interval);
-                return;
-            }
-        }, 1000);
-    }
+    // function handleCountdown(myCounter){
+    //     if (!players[myCounter].Active || players[myCounter].AlreadyCounting){
+    //         return;
+    //     }
+    //     setCountdownClock(players[myCounter].TimeAllowed);
+    //     const now = Date.now();
+    //     const then = now + players[myCounter].TimeAllowed * 1000;
+    //     const interval = setInterval(() => {
+    //         //check if we should stop the timer
+    //         if(!players[myCounter].Active || counter !== myCounter){
+    //             console.log("Out!");
+    //             clearInterval(interval);
+    //             return;
+    //         };
+    //         const secondsLeft = Math.round((then - Date.now()) / 1000);
+    //         setCountdownClock(secondsLeft);
+    //         if (secondsLeft <= 0){
+    //             alert(`${players[myCounter].Name} ran out of time`);
+    //             clearInterval(interval);
+    //             return;
+    //         }
+    //     }, 1000);
+    // }
 
+    //Function to allow players to change their order
     function checkForOrderChange(){
         const positions = document.querySelectorAll('.position');
         positions.forEach(pos => pos.disabled = false);
         document.querySelector('.changeOrder').style.display = 'block';
     }
 
+    //Reordering players based on input
     function handleOrderChange(){
-        // readyForCount.current = true;
         const myArray = [...players];
         myArray.sort((a,b) => a.Position > b.Position ? 1 : -1);
-        setPlayers(oldPlayers => {oldPlayers.map((player) => player.Id === 0 ? {...myArray[player.Id], Id: player.Id, Active: true} : {...myArray[player.Id], Id: player.Id})});
+        setPlayers(oldPlayers => {oldPlayers.map(player => player.Id === 0 ? {...myArray[player.Id], Id: player.Id, Active: true} : {...myArray[player.Id], Id: player.Id})});
         const positions = document.querySelectorAll('.position');
         positions.forEach(pos => pos.disabled = true);
         document.querySelector('.changeOrder').style.display = 'none';
         document.getElementById('0').style.visibility="visible";
     }
 
+    //Function to change the individual players 'position' (The position attribute will then be used to order the players)
     function handleInternalPosition(oldPos, newPos) {
-        setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === oldPos ? {...player, Position: newPos} : {...player}));
+        setPlayers((oldPlayers) => oldPlayers.map(player => player.Id === oldPos ? {...player, Position: newPos} : {...player}));
     }
 
+    //Function to change the individual players' names
     function handleNameChange(newName, position){
-        setPlayers((oldPlayers) => oldPlayers.map((player) => player.Id === position ? {...player, Name: newName} : {...player}));
+        setPlayers((oldPlayers) => oldPlayers.map(player => player.Id === position ? {...player, Name: newName} : {...player}));
     }
 
     function endGame(){
@@ -139,7 +180,7 @@ function PlayerSetup(){
     }
 
     return(
-        <div style={{margin: '10px'}}>
+        <div className="HoldingDiv" style={{margin: '10px'}}>
           <form onSubmit={handlePlayers} id="StartForm">
             <label>
               Number of Players:

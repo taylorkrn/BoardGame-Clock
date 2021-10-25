@@ -6,6 +6,8 @@ export default function PlayerList({ Players, HandleOrderChange, HandleNextTurn,
 
     return(
         <div>
+            <div className="Square"></div>
+            <div className="Square"></div>
             {Players.map(player => {
                 return <Player key={player.Id} player={player} HandleNextTurn={HandleNextTurn} HandleNameChange={HandleNameChange} HandleInternalPosition={HandleInternalPosition}/>
             })}
@@ -13,6 +15,8 @@ export default function PlayerList({ Players, HandleOrderChange, HandleNextTurn,
                 <p>Change Player Order</p>
                 <button onClick={HandleOrderChange}>Confirm Order</button>
             </div>
+            <div className="Square"></div>
+            <div className="Square"></div>
         </div>
     )
 }

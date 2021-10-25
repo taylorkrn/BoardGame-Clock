@@ -10,12 +10,16 @@ export default function Player({ player, HandleNextTurn, HandleNameChange, Handl
     }
 
     function handlePosition(e){
-        HandleInternalPosition(player.Id,parseInt(e.target.value));
+        HandleInternalPosition(player.Id,parseInt(e.target.value) - 1);
     }
 
     return(
-        <div>
-            <input type='number' value={player.Position+1} onChange={handlePosition} disabled={true} className='position'/>
+        <div className="Player">
+            <div className="Square">
+                <div className="PlayerPiece" style={{backgroundColor: `${player.Color}`}}>
+                    <input type='number' value={player.Position+1} onChange={handlePosition} disabled={true} className='position'/>
+                </div>
+            </div>
             <input value={player.Name} onChange={handleName} disabled={true} className='name'/>
             <CountdownClock
                 SecsLeft = {player.TimeAllowed}

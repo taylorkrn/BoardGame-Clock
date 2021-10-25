@@ -17,7 +17,7 @@ function App() {
       <div>
         <PlayerSetup />
       </div>
-      <div style={{margin: '20px'}}>
+      <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', margin: '20px'}}>
         <button onClick={refreshPage}>Restart Game!</button>
       </div>
     </div>
