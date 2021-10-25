@@ -24,19 +24,8 @@ function PlayerSetup(){
         const now = Date.now();
         const then = now + players[myCounter].TimeAllowed * 1000;
         const timer = setTimeout(() => {
-            //check if we should stop the timer
-            if(!players[myCounter].Active || myCounter !== counter){
-                console.log("Out!");
-                clearTimeout(timer);
-                return;
-            };
             const secondsLeft = Math.round((then - Date.now()) / 1000);
-            setPlayers(previousPlayers => previousPlayers.map(player => player.Id === myCounter ? {...player, TimeAllowed: secondsLeft} : {...player}));;
-            if (secondsLeft <= 0){
-                alert(`${players[myCounter].Name} ran out of time`);
-                clearTimeout(timer);
-                return;
-            }
+            setPlayers(previousPlayers => previousPlayers.map(player => player.Id === myCounter ? {...player, TimeAllowed: secondsLeft} : {...player}));
         }, 1000);
         return () => clearTimeout(timer);
     }, [players, counter]);
@@ -57,7 +46,7 @@ function PlayerSetup(){
         };
         const myArray = [];
         for (let i=0; i<numPlayers; i++){
-            myArray.push({Id: i, Name: `Player ${i+1}`, Position: i, TimeAllowed: timeAllowed, Active: false, AlreadyCounting: false, Color: colors[i]});
+            myArray.push({Id: i, Name: `Player ${i+1}`, Position: i, TimeAllowed: timeAllowed, Active: false, Color: colors[i]});
         }
         setPlayers(myArray);
         document.querySelector('#StartForm').style.display = 'none';
@@ -136,7 +125,6 @@ function PlayerSetup(){
         myArray[0].Active = true;
         for (let i = 0; i < myArray.length; i++){
             myArray[i].Id = i;
-            console.log(myArray[i]);
         }
         setPlayers(myArray);
         const positions = document.querySelectorAll('.position');

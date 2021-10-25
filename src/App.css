@@ -131,8 +131,12 @@ input .nameInput toEdit{
 .Player {
   display: flex;
   align-items: center;
+  gap: 10px;
+
 }
 
 .name {
   max-height: 20px;
+  max-width:  80px;
+
 }

@@ -3,9 +3,18 @@ import './App.css';
 
 
 export default function CountdownClock({SecsLeft}){
+
+    let textColor = 'black';
+    if (SecsLeft <= 0){
+        textColor = 'red';
+    }
+
     function toTimeString(secsLeft){
         let newString = '';
         let remainderLeft = secsLeft;
+        if (secsLeft < 0){
+            remainderLeft = - secsLeft;
+        }
         if (remainderLeft >=3600){
             const hours = Math.floor(remainderLeft / 3600);
             remainderLeft = remainderLeft % 3600;
@@ -19,7 +28,7 @@ export default function CountdownClock({SecsLeft}){
 
     return(
         <div style={{display: "inline-block"}}>
-            <p style={{display: "inline-block"}} className='time'>{toTimeString(SecsLeft)}</p>
+            <p style={{display: "inline-block", color: `${textColor}`}} className='time'>{toTimeString(SecsLeft)}</p>
         </div>
     )
 }
