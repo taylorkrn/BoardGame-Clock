@@ -31,7 +31,6 @@ function PlayerSetup(){
                 return;
             };
             const secondsLeft = Math.round((then - Date.now()) / 1000);
-            console.log(secondsLeft);
             setPlayers(previousPlayers => previousPlayers.map(player => player.Id === myCounter ? {...player, TimeAllowed: secondsLeft} : {...player}));;
             if (secondsLeft <= 0){
                 alert(`${players[myCounter].Name} ran out of time`);
@@ -94,7 +93,7 @@ function PlayerSetup(){
         document.getElementById('0').style.visibility="visible";
     }
 
-
+    //Function to move onto the next player's turn
     function handleNextTurn(){
         document.getElementById(`${counter}`).style.visibility="hidden";
         const nextCounter = (counter + 1) % players.length;
@@ -123,30 +122,6 @@ function PlayerSetup(){
         }
     }
 
-    // function handleCountdown(myCounter){
-    //     if (!players[myCounter].Active || players[myCounter].AlreadyCounting){
-    //         return;
-    //     }
-    //     setCountdownClock(players[myCounter].TimeAllowed);
-    //     const now = Date.now();
-    //     const then = now + players[myCounter].TimeAllowed * 1000;
-    //     const interval = setInterval(() => {
-    //         //check if we should stop the timer
-    //         if(!players[myCounter].Active || counter !== myCounter){
-    //             console.log("Out!");
-    //             clearInterval(interval);
-    //             return;
-    //         };
-    //         const secondsLeft = Math.round((then - Date.now()) / 1000);
-    //         setCountdownClock(secondsLeft);
-    //         if (secondsLeft <= 0){
-    //             alert(`${players[myCounter].Name} ran out of time`);
-    //             clearInterval(interval);
-    //             return;
-    //         }
-    //     }, 1000);
-    // }
-
     //Function to allow players to change their order
     function checkForOrderChange(){
         const positions = document.querySelectorAll('.position');
@@ -158,7 +133,12 @@ function PlayerSetup(){
     function handleOrderChange(){
         const myArray = [...players];
         myArray.sort((a,b) => a.Position > b.Position ? 1 : -1);
-        setPlayers(oldPlayers => {oldPlayers.map(player => player.Id === 0 ? {...myArray[player.Id], Id: player.Id, Active: true} : {...myArray[player.Id], Id: player.Id})});
+        myArray[0].Active = true;
+        for (let i = 0; i < myArray.length; i++){
+            myArray[i].Id = i;
+            console.log(myArray[i]);
+        }
+        setPlayers(myArray);
         const positions = document.querySelectorAll('.position');
         positions.forEach(pos => pos.disabled = true);
         document.querySelector('.changeOrder').style.display = 'none';
