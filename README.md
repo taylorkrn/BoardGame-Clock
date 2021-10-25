@@ -1,5 +1,5 @@
 
-![](https://raw.githubusercontent.com/taylorkrn/boardgame_clock/master/Screenshot.png)
+![](https://raw.githubusercontent.com/taylorkrn/BoardGame-Clock/main/Screenshot.png)
 
 
 # https://boardgame-clock.surge.sh/
