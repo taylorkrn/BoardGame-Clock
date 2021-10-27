@@ -178,15 +178,6 @@ function PlayerSetup(){
           </div>
         </div>
     );
-
-
 }
 
 export default PlayerSetup;
-
-
-
-        // document.querySelector('#StartForm').style.display = 'none';
-        // document.querySelector('#TimeForm').style.display = 'block';
-        // const names = document.querySelectorAll('.nameInput');
-        // names.forEach(name => name.disabled = false);
